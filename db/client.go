@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -52,18 +51,13 @@ func SpawnRepository(cfg Config) (*Repository, error) {
 	}, nil
 }
 
-func (r *Repository) SaveLog(requestId string, message string) error {
-	entry := logrus.WithFields(
-		logrus.Fields{
-			"requestId": requestId,
-			"message":   message,
-		})
-
-	log.Println(entry)
+func (r *Repository) SaveLog(requestId string, contentType string, content string) error {
 
 	_, err := r.mg.Database(r.dbname).Collection(r.collname).InsertOne(context.TODO(), bson.D{
 		{"RequestID", requestId},
-		{"LogDetails", entry},
+		{"Type", contentType},
+		{"LogDetails", content},
+		{"CreatedAt", time.Now()},
 	})
 	if err != nil {
 		return fmt.Errorf("error storing log: %w", err)

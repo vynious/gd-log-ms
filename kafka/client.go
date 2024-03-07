@@ -40,22 +40,22 @@ func (ls *LogSubscriber) Start() {
 	for {
 		msg, err := ls.Subscriber.ReadMessage(context.Background())
 		if err != nil {
-			log.Fatalf("error reading kafka messages: %v", err)
+			log.Println("error reading kafka messages: ", err)
 		}
-
-		log.Printf("%v", err)
 
 		var logEntry struct {
-			requestId string
-			message   string
+			RequestId   string `json:"requestId"`
+			Content     string `json:"content"`
+			ContentType string `json:"contentType"`
 		}
 
+		log.Printf("%v", msg)
 		if err := json.Unmarshal(msg.Value, &logEntry); err != nil {
 			log.Println("failed to unmarshal msg: ", err)
 			continue
 		}
 
-		if err = ls.Store.SaveLog(logEntry.requestId, logEntry.message); err != nil {
+		if err = ls.Store.SaveLog(logEntry.RequestId, logEntry.ContentType, logEntry.Content); err != nil {
 			log.Printf("failed to save store logs")
 			continue
 		}
