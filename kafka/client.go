@@ -49,7 +49,6 @@ func (ls *LogSubscriber) Start() {
 			ContentType string `json:"contentType"`
 		}
 
-		log.Printf("%v", msg)
 		if err := json.Unmarshal(msg.Value, &logEntry); err != nil {
 			log.Println("failed to unmarshal msg: ", err)
 			continue

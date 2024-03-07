@@ -53,15 +53,19 @@ func SpawnRepository(cfg Config) (*Repository, error) {
 
 func (r *Repository) SaveLog(requestId string, contentType string, content string) error {
 
+	timestamp := time.Now()
+
 	_, err := r.mg.Database(r.dbname).Collection(r.collname).InsertOne(context.TODO(), bson.D{
 		{"RequestID", requestId},
 		{"Type", contentType},
 		{"LogDetails", content},
-		{"CreatedAt", time.Now()},
+		{"CreatedAt", timestamp},
 	})
 	if err != nil {
 		return fmt.Errorf("error storing log: %w", err)
 	}
+	log.Printf("RequestID: %v, Type: %v, LogDetails: %v, CreatedAt: %v", requestId, contentType, content, timestamp)
+
 	return nil
 }
 
